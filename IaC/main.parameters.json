@@ -4,6 +4,15 @@
     "parameters": {
         "vWANname": {
             "value": "vwan1"
+        },
+        "vpnConnectionName":{
+            "value": "timbuktu-to-azure"
+        },
+        "vpnGatewayName":{
+            "value": "vwanVPNGW"
+        },
+        "vpnSiteName":{
+            "value": "timbuktu"
         }
     }
 }
