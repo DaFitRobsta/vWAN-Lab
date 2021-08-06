@@ -13,6 +13,21 @@
         },
         "vpnSiteName":{
             "value": "timbuktu"
+        },
+        "adminUsername": {
+            "value": "adm.infra.usr"
+        },
+        "adminPassword": {
+            "value": "p@leClass75t@llPear83"
+        },
+        "autoShutdownTimeZone": {
+            "value": "US Mountain Standard Time"
+        },
+        "vmSize": {
+            "value": "Standard_B2s"
+        },
+        "osDiskType": {
+            "value": "StandardSSD_LRS"
         }
     }
 }

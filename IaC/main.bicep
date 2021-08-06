@@ -20,6 +20,21 @@ param vpnSiteName string
 @description('Name of the on-prem router/server')
 param onPremVMName string = 'timbuktu'
 
+@description('Provide a local admin username for the server')
+param adminUsername string
+
+@description('Admin password for the local admin account')
+@secure()
+param adminPassword string
+
+@description('Set the timezone of your region. To get timezones, run this from PowerShell [System.TimeZoneInfo]::GetSystemTimeZones() | select id')
+param autoShutdownTimeZone string = 'US Mountain Standard Time'
+
+@description('Specify the VM SKU')
+param vmSize string = 'Standard_B2s'
+
+param osDiskType string = 'StandardSSD_LRS'
+
 // Parameters for VNETs
 var location = resourceGroup().location
 
@@ -44,6 +59,11 @@ module createOnPremVmNSG 'Compute/00.onpremRouter.bicep' = {
     vmName: onPremVMName 
     location: location
     subnetRef: createVNets.outputs.onpremVnetSubnetRef
+    adminUsername: adminUsername
+    adminPassword: adminPassword
+    autoShutdownTimeZone: autoShutdownTimeZone
+    vmSize: vmSize
+    osDiskType: osDiskType
   }
   
 }

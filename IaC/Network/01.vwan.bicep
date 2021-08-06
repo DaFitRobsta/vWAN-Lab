@@ -76,7 +76,15 @@ resource vpnGateway 'Microsoft.Network/vpnGateways@2021-02-01' = {
           enableBgp: true
           remoteVpnSite: {
             id: vpnSite.id 
-          }
+          }/*
+         vpnLinkConnections: [
+           {
+             name: 'Primary'
+             properties: {
+               
+             }
+           }*/
+         ]
         }
       }
     ]

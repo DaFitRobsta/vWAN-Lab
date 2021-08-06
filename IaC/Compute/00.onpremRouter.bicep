@@ -130,7 +130,7 @@ resource onpremVM 'Microsoft.Compute/virtualMachines@2021-03-01' = {
 }
 output adminUsername string = adminUsername
 
-resource shutdownVM 'Microsoft.DevTestLab/labs/schedules@2018-09-15' = {
+resource shutdownVM 'Microsoft.DevTestLab/schedules@2018-09-15' = {
   name: 'shutdown-computevm-${vmName}'
   location: location
   properties: {

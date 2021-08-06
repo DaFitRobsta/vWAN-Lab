@@ -1,3 +1,6 @@
+# Install required windows features for Routing
+Install-WindowsFeature -Name "DirectAccess-VPN", "Routing", "RSAT-RemoteAccess" -IncludeAllSubFeature -IncludeManagementTools -Restart
+Install-RemoteAccess -VpnType VpnS2S
 #primary connection
 
 $localIP="172.1.0.4"
@@ -5,7 +8,7 @@ $localSubnet="172.1.0.0/16"
 $localASN="65414"
 $peerIP="192.168.0.13"
 $peerASN="65515"
-$peername="rl-wu3-vhub-vpngw-instance-0"
+$peername="vhub-vpngw-instance-0"
 $peerPublicIP="20.150.153.222"
 $psk="rolightn3494"
 $peersubnet=@($peerIP+"/32:100")
@@ -22,7 +25,7 @@ Add-BgpCustomRoute -Network 90.0.0.0/32 -PassThru
 $localASN="65414"
 $peerIP="192.168.0.12"
 $peerASN="65515"
-$peername="rl-wu3-vhub-vpngw-instance-1"
+$peername="vhub-vpngw-instance-1"
 $peerPublicIP="20.150.153.241"
 $psk="rolightn3494"
 $peersubnet=@($peerIP+"/32:100")
