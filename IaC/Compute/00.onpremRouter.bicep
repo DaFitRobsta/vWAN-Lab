@@ -148,3 +148,23 @@ resource shutdownVM 'Microsoft.DevTestLab/schedules@2018-09-15' = {
     }
   }  
 }
+
+// Constructing the PowerShell commands to execute once VM is running
+var RRASInstallandConfigure = 'foobar'
+resource RRASInstall 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = {
+  name: '${vmName}/InstallRRAS'
+  location: location
+  dependsOn: [
+    onpremVM
+  ]
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.7'
+    autoUpgradeMinorVersion: true
+    settings: {
+      //  .\RRAS-Configuration.ps1 -localIP 172.1.0.4 -localSubnet "172.1.0.0/16" -peerPublicIP00 "20.150.153.222" -psk "rolightn3494" -peerPublicIP01 20.150.153.241
+      commandToExecute: RRASInstallandConfigure
+    } 
+  }
+}
