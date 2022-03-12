@@ -23,9 +23,7 @@ resource vwan 'Microsoft.Network/virtualWans@2021-02-01' = {
 resource vwanHub 'Microsoft.Network/virtualHubs@2021-02-01' = {
   name: vWANHubName
   location: location
-  dependsOn: [
-    vwan
-  ]
+  dependsOn: []
   properties: {
     addressPrefix: vWANHubAddressPrefix
     virtualWan: {
@@ -37,9 +35,7 @@ resource vwanHub 'Microsoft.Network/virtualHubs@2021-02-01' = {
 resource vpnSite 'Microsoft.Network/vpnSites@2021-02-01' = {
   name: vpnSiteName
   location: location
-  dependsOn: [
-    vwan
-  ]
+  dependsOn: []
   properties: {
     addressSpace: {
       addressPrefixes: []
@@ -65,7 +61,6 @@ resource vpnGateway 'Microsoft.Network/vpnGateways@2021-02-01' = {
   location: location
   dependsOn: [
     vwan
-    vpnSite
   ]
   properties: {
     connections: [
@@ -76,15 +71,10 @@ resource vpnGateway 'Microsoft.Network/vpnGateways@2021-02-01' = {
           enableBgp: true
           remoteVpnSite: {
             id: vpnSite.id 
-          }/*
-         vpnLinkConnections: [
-           {
-             name: 'Primary'
-             properties: {
-               
-             }
-           }*/
-         ]
+          }
+          sharedKey: 'rolightn3494'
+          vpnConnectionProtocolType: 'IKEv2'
+          usePolicyBasedTrafficSelectors: false
         }
       }
     ]
@@ -97,3 +87,6 @@ resource vpnGateway 'Microsoft.Network/vpnGateways@2021-02-01' = {
     vpnGatewayScaleUnit: vpnGatewayScaleUnit
   }
 }
+
+output vpnGatewayPublicIP00 string = vpnGateway.properties.ipConfigurations[0].publicIpAddress
+output vpnGatewayPublicIP01 string = vpnGateway.properties.ipConfigurations[1].publicIpAddress

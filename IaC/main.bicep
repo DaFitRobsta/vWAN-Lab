@@ -36,7 +36,7 @@ param vmSize string = 'Standard_B2s'
 param osDiskType string = 'StandardSSD_LRS'
 
 // Parameters for VNETs
-var location = resourceGroup().location
+param location string = resourceGroup().location
 
 // vWAN config
 var vhub_cfg = {
@@ -52,6 +52,19 @@ module createVNets 'Network/00.vnets.bicep' = {
   }  
 }
 
+// Create the Publc IP address for the on-prem router
+var pipName = '${onPremVMName}-pip'
+resource pip 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
+  name: pipName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
+}
+
 // TESTING creation of NSG
 module createOnPremVmNSG 'Compute/00.onpremRouter.bicep' = {
   name: 'createOnPremVmNSG'
@@ -64,10 +77,13 @@ module createOnPremVmNSG 'Compute/00.onpremRouter.bicep' = {
     autoShutdownTimeZone: autoShutdownTimeZone
     vmSize: vmSize
     osDiskType: osDiskType
+    publicIpAddressId: pip.id
+    vHubVpnGatewayPublicIp00: createVWAN.outputs.vpnGatewayPublicIP00
+    vHubVpnGatewayPublicIp01: createVWAN.outputs.vpnGatewayPublicIP01
   }
   
 }
-/*
+
 // Create Virtual WAN with hub and vpn gateway
 module createVWAN 'Network/01.vwan.bicep' = {
   name: 'createvWAN'
@@ -77,13 +93,38 @@ module createVWAN 'Network/01.vwan.bicep' = {
     vpnGatewayName: vpnGatewayName
     vpnGatewayScaleUnit: vpnGatewayScaleUnit
     vpnSiteASN: vpnSiteASN
-    vpnSitebgpPeeringAddress: '172.1.0.4' // need the private IP address of the onprem router vm
+    vpnSitebgpPeeringAddress: '172.1.0.4' // need the private IP address of the onprem router vm; assuming it's the first IP in the subnet
     vpnSiteName: vpnSiteName
-    vpnsitePublicIPAddress: '20.38.168.218'  // need the public IP address of the onprem route vm
+    vpnsitePublicIPAddress: pip.properties.ipAddress  // need the public IP address of the onprem route vm
     vWANHubName: vhub_cfg.name
     vWANHubAddressPrefix: vhub_cfg.addressSpacePrefix
     vWANname: vWANname
   }
   
 }
-*/
+
+// Create vHub Virtual Network Connections
+// Only create hub to spoke peerings
+module vnet01HubPeeringToRemoteVnet 'Network/04.hub-vnet-peering.bicep' = {
+  name: 'vnet01HubPeeringToRemoteVnet'
+  dependsOn: [
+    createVWAN
+  ]
+  params: {
+    vHubName: vhub_cfg.name
+    vnetId: createVNets.outputs.vnet1Id
+    vnetName: createVNets.outputs.vnet1Name 
+  }
+}
+
+module vnet02HubPeeringToRemoteVnet 'Network/04.hub-vnet-peering.bicep' = {
+  name: 'vnet02HubPeeringToRemoteVnet'
+  dependsOn: [
+    createVWAN
+  ]
+  params: {
+    vHubName: vhub_cfg.name
+    vnetId: createVNets.outputs.vnet2Id
+    vnetName: createVNets.outputs.vnet2Name 
+  }
+}

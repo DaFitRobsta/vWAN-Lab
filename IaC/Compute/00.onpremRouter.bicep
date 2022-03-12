@@ -9,6 +9,9 @@ param adminPassword string
 param patchMode string = 'AutomaticByOS'
 param autoShutdownTimeZone string = 'US Mountain Standard Time'
 param autoShutdownNotificationLocale string = 'en'
+param publicIpAddressId string
+param vHubVpnGatewayPublicIp00 string
+param vHubVpnGatewayPublicIp01 string
 
 var nsgName = '${vmName}-nsg'
 var nsgRules = [
@@ -27,7 +30,7 @@ var nsgRules = [
   }
 ]
 
-var pipName = '${vmName}-pip'
+//var pipName = '${vmName}-pip'
 var nicName = '${vmName}-nic'
 
 //Create NSG for on-prem router
@@ -39,7 +42,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
   }
 }
 
-// Create the Publc IP address for the on-prem router
+/* // Create the Publc IP address for the on-prem router
 resource pip 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   name: pipName
   location: location
@@ -50,7 +53,7 @@ resource pip 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
     publicIPAllocationMethod: 'Static'
   }
 }
-output pipIPaddress string = pip.properties.ipAddress
+output pipIPaddress string = pip.properties.ipAddress */
 
 // Create the NIC for the on-prem router
 resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
@@ -67,7 +70,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {
-            id: pip.id
+            id: publicIpAddressId
           }
         }
       }
@@ -150,7 +153,7 @@ resource shutdownVM 'Microsoft.DevTestLab/schedules@2018-09-15' = {
 }
 
 // Constructing the PowerShell commands to execute once VM is running
-var RRASInstallandConfigure = 'foobar'
+var RRASInstallandConfigure = 'powershell.exe -ExecutionPolicy Unrestricted -File RRAS-Configuration.ps1 -localIP 172.1.0.4 -localSubnet "172.1.0.0/16" -peerPublicIP00 ${vHubVpnGatewayPublicIp00} -psk "rolightn3494" -peerPublicIP01 ${vHubVpnGatewayPublicIp01}'
 resource RRASInstall 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = {
   name: '${vmName}/InstallRRAS'
   location: location
@@ -163,7 +166,11 @@ resource RRASInstall 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' =
     typeHandlerVersion: '1.7'
     autoUpgradeMinorVersion: true
     settings: {
+      fileUris: [
+        'https://raw.githubusercontent.com/DaFitRobsta/vWAN-Lab/master/artifacts/RRAS-Configuration.ps1'
+      ]
       //  .\RRAS-Configuration.ps1 -localIP 172.1.0.4 -localSubnet "172.1.0.0/16" -peerPublicIP00 "20.150.153.222" -psk "rolightn3494" -peerPublicIP01 20.150.153.241
+      // commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File RRAS-Configuration.ps1 -localIP 172.1.0.4 -localSubnet "172.1.0.0/16" -peerPublicIP00 "20.150.153.222" -psk "rolightn3494" -peerPublicIP01 20.150.153.241'
       commandToExecute: RRASInstallandConfigure
     } 
   }

@@ -48,7 +48,11 @@ resource hubVNets 'Microsoft.Network/virtualNetworks@2021-02-01' = [for vnet in 
   }
 }]
 output vnet1SubnetRef string = hubVNets[0].properties.subnets[0].id
+output vnet1Name string = hubVNets[0].name
+output vnet1Id string = hubVNets[0].id
 output vnet2SubnetRef string = hubVNets[1].properties.subnets[0].id
+output vnet2Name string = hubVNets[1].name
+output vnet2Id string = hubVNets[1].id
 
 resource onpremVNet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
   name: vnet_onprem_cfg.name
