@@ -19,15 +19,13 @@ catch {
 }
 Write-Host ""
 Write-Host "List of available subscriptions:" -ForegroundColor Green
-(Get-AzSubscription).name
+$subscriptionName = (Get-AzSubscription).name | Out-Gridview -outputmode singel -title 'Select Subscription Name'
 Write-Host ""
-$subscriptionName = Read-Host -Prompt "Enter Subscription Name"
 $result = Select-AzSubscription -SubscriptionName $subscriptionName
 Write-Host ""
 Write-Host "List of available Resource Groups:" -ForegroundColor Green
-(Get-AzResourceGroup).ResourceGroupName
+$resourceGroup = (Get-AzResourceGroup).ResourceGroupName | Out-GridView -OutputMode Single -Title 'Select the Resource Group Name (where ARM template will be deployed into)'
 Write-Host ""
-$resourceGroup = Read-Host -Prompt "Enter the Resource Group Name (where ARM template will be deployed into)"
 $bicepFile = '.\main.bicep'
 $mainParametersFiles = $TemplateParameterFile
 New-AzResourceGroupDeployment `
